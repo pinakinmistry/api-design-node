@@ -1,10 +1,9 @@
-// TODO: user app.params to find the lion using the id
+// TODO: user app.param to find the lion using the id
 // and then attach the lion to the req object and call next. Then in
 // '/lion/:id' just send back req.lion
 
 // create a middleware function to catch and handle errors, register it
 // as the last middleware on app
-
 
 // create a route middleware for POST /lions that will increment and
 // add an id to the incoming new lion object on req.body
@@ -19,21 +18,32 @@ var lions = [];
 var id = 0;
 
 var updateId = function(req, res, next) {
-  // fill this out. this is the route middleware for the ids
+  if(!req.body.id) {
+  	id++;
+  	req.body.id = id + '';
+  }
+  next();
 };
 
 app.use(morgan('dev'))
 app.use(express.static('client'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
+var lion;
 
 app.param('id', function(req, res, next, id) {
   // fill this out to find the lion based off the id
   // and attach it to req.lion. Rember to call next()
+  lion = _.find(lions, { id: id });
+  if(lion) {
+	req.lion = lion;
+	next();
+  } else {
+  	res.send();
+  }
 });
 
-app.get('/lions', function(req, res){
+app.get('/lions', function(req, res, next){
   res.json(lions);
 });
 
@@ -66,5 +76,12 @@ app.put('/lions/:id', function(req, res) {
   }
 });
 
-app.listen(3000);
-console.log('on port 3000');
+app.use(function (err, req, res, next) {
+  if(err) {
+    console.log('Error', err);
+    res.status(500).send(err);
+  }
+});
+
+app.listen(4000);
+console.log('on port 4000');
