@@ -7,6 +7,10 @@ var auth = require('./auth/routes');
 // db.url is different depending on NODE_ENV
 require('mongoose').connect(config.db.url);
 
+if (config.cleanDB) {
+  require('./util/clean-db');
+}
+
 if (config.seed) {
   require('./util/seed');
 }
